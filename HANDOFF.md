@@ -49,11 +49,11 @@ A static page that signs a PDF the reader already has: open it, draw a signature
 
 ## The journal
 
-`../PDF-Signature-Adder-journal/index.html`, its own repository, never pushed; published privately at <https://claude.ai/artifact/Xc7eZsY9VkYwQBvwGcM8ta>. Newest entry: *live*, 2026-10-19.
+`../PDF-Signature-Adder-journal/index.html`, its own repository, never pushed; published privately at <https://claude.ai/artifact/Xc7eZsY9VkYwQBvwGcM8ta>. Newest entry: *your fixes*, T1 confirmed, 2026-10-19.
 
 ## Open for the person
 
-No `SECOND-ORDER.md` row has status *person*. R2.1 (open): retry signing with the Pencil on the iPad, to confirm T1. What only the person can check (stage 7): open a real form on the iPad, sign it with the Pencil, save it, and open the copy in Files, Preview and Acrobat; paste a signature from Photos; read the strings in `data/strings.json`.
+No `SECOND-ORDER.md` row has status *person* or *open*. T1 (Pencil scrolled the page) was confirmed fixed on the person's iPad (R2.1, done). What only the person can check (stage 7): open a real form on the iPad, sign it with the Pencil, save it, and open the copy in Files, Preview and Acrobat; paste a signature from Photos; read the strings in `data/strings.json`.
 
 ## Mistakes so far
 
