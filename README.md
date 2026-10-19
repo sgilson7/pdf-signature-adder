@@ -1,36 +1,36 @@
-# A Builder tool
+# PDF Signature Adder
 
-Replace this file with your tool's README once `BRIEF.md` is written. `crates/core/tests/copy.rs` reads it against `TONE.md`.
+Sign a PDF on your iPad or laptop with a drawn or pasted signature, and save the signed copy.
 
-This directory is a copy of the Builder template. Its rules are in `BUILDER-SPEC.md`, a coding agent's instructions are in `CLAUDE.md` and `AGENTS.md`, the meaning of each term is in `GLOSSARY.md`, and the rules for every string are in `TONE.md`.
+**Use it:** <https://sgilson7.github.io/pdf-signature-adder/>
 
-## Build, test and serve
+Open a PDF, draw your signature with an Apple Pencil, a finger or the mouse (or paste or open a picture of it), tap the page where it goes, and save. On an iPad the signed copy goes to Files, or to Mail or AirDrop through Share.
+
+## What happens to your file
+
+The PDF and the signature stay in the browser tab. The page loads once from GitHub Pages and then makes no request of any kind, and it keeps nothing after you close the tab. The browser check fails if the page sends a request after it is ready or leaves anything in browser storage, and `scripts/prove-privacy.sh` plants five leaks to show the check catches each one.
+
+## What the signed copy is
+
+The signed copy is your original file, byte for byte, with the signatures appended as an incremental update, the way Acrobat and Preview add annotations. Text stays selectable, and links and form fields are untouched. A drawn signature is written as vector paths; a picture is written as an image with a transparency mask.
+
+The signature is a picture of your handwriting. It is not a cryptographic digital signature and does not certify anything.
+
+The tool refuses a PDF it cannot amend safely, and says why: one that is encrypted or locked against editing, one certified against any change, or one too damaged to read.
+
+## How it is built
+
+A [Builder](https://github.com/sgilson7/builder-setting) project. Every rule (reading the PDF, where a signature sits on a rotated or cropped page, smoothing strokes, writing the update) is in a Rust core with no input or output, tested in seconds. A WebAssembly shim forwards calls and decides nothing. The page draws what the core describes, and vendored [pdf.js](https://mozilla.github.io/pdf.js/) 4.10.38 paints the pages.
 
 ```bash
-./scripts/setup.sh              # once: Python venv with Playwright and three browsers
-cargo test --workspace          # the core, boundary, copy and storage tests, in seconds
-./scripts/build.sh              # release WebAssembly build into dist/
-python3 scripts/serve.py        # http://127.0.0.1:8000/
-./scripts/check.sh              # everything, before publishing
-python3 scripts/break_tests.py  # each row of tests/breaks.json must make its test fail
-./scripts/count-tests.sh        # the test count to quote in a document
-./scripts/publish.sh            # stage 8: push dist/ to gh-pages, from a clean tree
-python3 tools/journal/new_journal.py  # once: start the design journal beside this folder
+./scripts/check.sh                          # format, lint, tests, build, audits, browser check
+python3 scripts/break_tests.py              # each behaviour test fails with its behaviour broken
+./scripts/prove-privacy.sh                  # each planted leak is caught
+python3 scripts/smoke.py IN_DIR OUT_DIR     # sign real PDFs and have Poppler check each copy
 ```
 
-Needs Rust (pinned in `rust-toolchain.toml`), `wasm-bindgen-cli` 0.2.127, and Python 3. Rendering art needs `pdflatex` and `pdftocairo`; the check does not.
+`BRIEF.md` holds the request word for word, `PLAN.md` the build order, `SECOND-ORDER.md` what was decided and found along the way, and `HANDOFF.md` where things stand. `builder-setting/` is a copy of Builder kept for reference.
 
-## Layout
+## Licence
 
-| Path | Holds |
-| --- | --- |
-| `crates/core` | every application rule; no input or output; `api.rs` is the door: `start`, and `act(name, value)` |
-| `crates/shim` | the `wasm-bindgen` functions the page calls; each is one call into the core |
-| `web/` | the static page: a generic renderer for the core's view model |
-| `data/` | reader-visible text, presentation numbers, shaders |
-| `GLOSSARY.md`, `TONE.md` | what each term means; how every string is written |
-| `tools/art/`, `styles/default/` | the art pipeline and its fallback style pack |
-| `tools/journal/` | the design journal's page, its entry kinds, and the script that starts it in `../<this folder>-journal/` |
-| `tests/browser/` | the browser check and this tool's interactions |
-| `tests/breaks.json` | one deliberate break per rule, for `scripts/break_tests.py` |
-| `scripts/` | build, check, serve, publish, import audit, mutation audit, test count |
+MIT. pdf.js is Apache-2.0; see `LICENSES.md`.

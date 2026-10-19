@@ -64,4 +64,8 @@ These stay with the person and go in `BRIEF.md` or `PLAN.md`:
 
 | Default | Changed to | Reason | Recorded in |
 | --- | --- | --- | --- |
-| | | | |
+| R4 template convention (state as JSON round trip) | the shim holds the core's `Handle`; the core keeps the PDF and the signatures; byte-carrying calls beside `act` | a PDF cannot cross the boundary as JSON on every pointer move; the requirement (ordinary values in and out, one `act` door) still holds | `crates/shim/src/lib.rs`; `PLAN.md` step 8 |
+| D1 (allowlist) | adds `miniz_oxide` | object streams are Flate-compressed (PS-Q3, approved 2026-10-19) | `BRIEF.md`; `DECISIONS.md` |
+| D4, D7 | stricter CSP; the browser check fails on any request after ready and on any stored data | the tool handles the reader's own data and promises to keep it on the device (kits/privacy) | `SECOND-ORDER.md` R1.12 |
+| D7 | the browser check adds a `webkit-ipad` pass and runs it by default; no manifest, so D4 is not loosened | the tool is meant for an iPad (kits/mobile, PS-Q8) | `SECOND-ORDER.md` R1.4 |
+| Vendored files | pdf.js 4.10.38 under `web/vendor/pdfjs/`, run on the page's own thread with its worker module imported before ready | the page paints PDF pages; R7 needs it from the same origin and the privacy check needs no request after ready | `LICENSES.md`; `SECOND-ORDER.md` R1.5 |
