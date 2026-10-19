@@ -31,7 +31,18 @@
 
 ## Rules agreed for this project
 
-None yet. When the person answers the opening entry's questions, add each rule that applies to every later session here, with its journal ID.
+Agreed 2026-10-19 (journal `#opening`, `#agreed`). Each names what holds it.
+
+- **PS-1** The saved PDF begins with the original's bytes, unchanged; the signature is an appended incremental update. Held by `crates/core/tests/sign.rs`.
+- **PS-2** Every position and size is decided in the core, in thousandths of a PDF point, through rotation and crop box. The page positions overlays from strings the core returns. Held by `place.rs` tests and the boundary scan.
+- **PS-3** Nothing leaves the device and nothing is kept: no request of any kind after the page is ready, no cookies or storage. Held by the privacy additions to `tests/browser/check.py`, `no_storage.rs` and `scripts/prove-privacy.sh`.
+- **PS-4** "Signature" means the mark a person writes; no string says or implies digital signing, certification or verification. Held by `GLOSSARY.md`'s `Not:` lines and `copy.rs`.
+- **PS-5** A PDF the tool cannot amend safely is refused with a message naming the reason. Held by `pdf` module tests.
+- **PS-6** The core reads its own output back before offering it. Held by `write.rs` and `sign.rs` tests.
+- **PS-7** pdf.js only paints, is vendored and pinned by checksum, and loads before ready. Held by `scripts/build.sh` and the browser check.
+- **PS-8** Every control works by touch, Pencil, mouse and keyboard; touch targets are at least the size in `data/layout.json`. Held by the iPad pass of the browser check.
+- **R1.11** Do not add `'unsafe-inline'` to `style-src` to quiet console errors seen while taking Playwright screenshots in WebKit: the screenshot tool injects that stylesheet, not the page.
+- **PS-9** The saved file opens in other readers with the signature where it was placed. Held by the person's use (stage 7); `scripts/smoke.py` renders outputs with Poppler as a second reader.
 
 ## Stopping
 

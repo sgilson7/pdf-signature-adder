@@ -44,7 +44,7 @@ Every control is a button with a text label, reachable by keyboard, with a targe
 
 The person's grant, word for word: *"I give you approval to create a public github repo, a public github pages for deployment, and "make deploy" level approval for updating sgilson7 website with the new tool."*
 
-The plan is **not** approved in advance: the person asked to see the reading and the mockups "before you begin the full build", so the agent stops after the opening entry and the mockups entry and waits for answers. After the plan is approved, where this brief is silent the agent decides, records the decision in `SECOND-ORDER.md`, and continues. The agent may not loosen a Builder requirement or a boundary test, and may not add a server, an account, analytics or any off-origin request. Once `./scripts/check.sh` passes, the agent may create the public repository the person approves under PS-Q1, publish it to GitHub Pages with `./scripts/publish.sh`, and run `make deploy` in `~/Documents/website` to list the tool, following that repository's own `CLAUDE.md`.
+The person first asked to see the reading and the mockups "before you begin the full build". On 2026-10-19 they answered "go with all defaults, build the tool and deploy" (`DECISIONS.md`), so the plan is approved in advance from then on. Since then, where this brief is silent the agent decides, records the decision in `SECOND-ORDER.md`, and continues. The agent may not loosen a Builder requirement or a boundary test, and may not add a server, an account, analytics or any off-origin request. Once `./scripts/check.sh` passes, the agent may create the public repository the person approves under PS-Q1, publish it to GitHub Pages with `./scripts/publish.sh`, and run `make deploy` in `~/Documents/website` to list the tool, following that repository's own `CLAUDE.md`.
 
 ## Journal
 
@@ -52,4 +52,4 @@ The plan is **not** approved in advance: the person asked to see the reading and
 
 ## Allowed core dependencies
 
-`serde`, `serde_json` (reference default). A compression crate is an open question (PS-Q3).
+`serde`, `serde_json` (reference default), and `miniz_oxide` (PS-Q3, approved 2026-10-19): most PDFs keep their page objects in Flate-compressed object streams, so the core must inflate them, and it deflates what it writes. Pure Rust, no input or output.
