@@ -13,3 +13,21 @@ Where slush comes out. Each line has up to {line.spouts} spouts.
 
 Not: tap, dispenser, nozzle
 -->
+
+### Signature
+
+The mark you write, drawn on the signature pad or taken from a picture, and placed on a page. It shows your handwriting; it does not certify the file or prove who signed it.
+
+Not: digital signature, e-signature, certified, verified
+
+### Signature pad
+
+The box in the signature sheet where you draw with a Pencil, a finger or the mouse.
+
+Not: canvas, drawing area
+
+### Signed copy
+
+The PDF the tool saves: your original file, unchanged, with the signatures added after it.
+
+Not: signed original, export

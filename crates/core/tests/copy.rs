@@ -18,7 +18,15 @@ use std::path::{Path, PathBuf};
 use tool_core::glossary;
 
 /// (file name, word, reason): a ruled-out word that is right in one file.
-const ALLOWED: &[(&str, &str, &str)] = &[];
+const ALLOWED: &[(&str, &str, &str)] = &[(
+    "data/strings.json.already_signed",
+    "digital signature",
+    "already_signed names a cryptographic signature someone else put in the PDF, which is not this tool's Signature",
+), (
+    "data/strings.json.refuse_certified",
+    "certified",
+    "refuse_certified describes the PDF's own certification (DocMDP), which the tool refuses to break; it says nothing about the Signature",
+)];
 
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("..")
