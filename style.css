@@ -1,0 +1,238 @@
+/* PDF Signature Adder. Plain like PDF Redactor: system fonts, one ink-blue
+   accent, the document as the largest thing on screen. The chrome follows the
+   reader's light or dark setting; a PDF page stays white. Touch targets are at
+   least --target (44 CSS px, Apple's guidance; PS-8). */
+:root {
+  --desk: #e7e9e4;
+  --panel: #ffffff;
+  --ink: #1f2731;
+  --muted: #5b646d;
+  --line: #c9cfc8;
+  --accent: #24508a;
+  --accent-ink: #ffffff;
+  --alert: #a3341a;
+  --select: #24508a;
+  --shade: rgba(20, 26, 33, 0.5);
+  --check-a: #ffffff;
+  --check-b: #e6e8e3;
+  --target: 44px;
+  --gutter: 16px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --desk: #15191d;
+    --panel: #1f252b;
+    --ink: #e4e8ea;
+    --muted: #a3adb4;
+    --line: #3a434b;
+    --accent: #8db4e6;
+    --accent-ink: #0d1722;
+    --alert: #f19a80;
+    --select: #8db4e6;
+    --shade: rgba(0, 0, 0, 0.6);
+    --check-a: #2a3138;
+    --check-b: #232a30;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  touch-action: manipulation;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+button {
+  font: inherit;
+  min-height: var(--target);
+  min-width: var(--target);
+  padding: 0 14px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+button[aria-pressed="true"] { border: 2px solid var(--ink); font-weight: 600; }
+button:disabled { opacity: 0.45; cursor: default; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* The bar */
+#bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: max(10px, env(safe-area-inset-top, 0px)) var(--gutter) 10px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+body[data-screen="start"] #bar { display: none; }
+.bar-file { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.file { display: grid; min-width: 0; }
+.file strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 34ch; }
+.file span { color: var(--muted); font-size: 14px; }
+.nav-label { min-width: 9ch; text-align: center; font-variant-numeric: tabular-nums; }
+.status-bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px var(--gutter) 0; }
+.status-bar p { margin: 0; color: var(--muted); }
+body[data-placing="true"] .status-bar p { color: var(--ink); font-weight: 600; }
+.message:not(:empty) { margin: 8px var(--gutter) 0; color: var(--alert); font-weight: 600; }
+.note:not(:empty) { margin: 8px var(--gutter) 0; color: var(--muted); }
+.message:empty, .note:empty { margin: 0; }
+
+/* The start screen */
+.start { max-width: 40rem; margin: 0 auto; padding: 12vh var(--gutter) 48px; display: grid; gap: 12px; }
+.start h1 { margin: 0; font-size: clamp(30px, 5vw, 42px); line-height: 1.1; }
+.start h2 { margin: 18px 0 0; font-size: 20px; }
+.start p { margin: 0; }
+.tagline { color: var(--muted); font-size: 18px; }
+.privacy { color: var(--muted); font-size: 15px; }
+.drop-hint { margin-top: 18px !important; padding: 26px; border: 2px dashed var(--line); border-radius: 8px; color: var(--muted); text-align: center; }
+.start .group button { min-height: 52px; padding: 0 22px; font-size: 17px; }
+
+/* Pages */
+.pages { display: grid; justify-content: center; gap: 22px; padding: 18px var(--gutter) 64px; }
+.page { display: grid; gap: 6px; justify-items: start; }
+.page-label { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+.paper {
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.08);
+  touch-action: pan-x pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.paper canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+body[data-placing="true"] .paper { cursor: crosshair; outline: 2px dashed var(--select); outline-offset: 3px; }
+.layer { position: absolute; inset: 0; }
+.overlay { position: absolute; touch-action: none; cursor: move; }
+.overlay svg, .overlay img { display: block; width: 100%; height: 100%; }
+.overlay.selected { outline: 2px dashed var(--select); outline-offset: 2px; }
+.handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid var(--select);
+}
+.handle.tl { left: -11px; top: -11px; cursor: nwse-resize; }
+.handle.tr { right: -11px; top: -11px; cursor: nesw-resize; }
+.handle.bl { left: -11px; bottom: -11px; cursor: nesw-resize; }
+.handle.br { right: -11px; bottom: -11px; cursor: nwse-resize; }
+.selection-actions {
+  position: absolute;
+  transform: translateY(calc(-100% - 14px));
+  display: flex;
+  gap: 0;
+  background: #1f2731;
+  border-radius: 8px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+.selection-actions button { background: transparent; border: 0; color: #ffffff; }
+
+/* Dialogs */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--shade);
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* An open dialog locks the page behind it (T1). */
+body[data-dialog="true"] { overflow: hidden; }
+.dialog {
+  width: min(900px, 100%);
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 20px clamp(16px, 3vw, 32px) 24px;
+  display: grid;
+  gap: 14px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+.dialog h2 { margin: 0; font-size: 22px; }
+.dialog-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dialog-actions { justify-content: flex-end; border-top: 1px solid var(--line); padding-top: 14px; }
+.dialog-actions button[data-action="signature.save_image"] { margin-right: auto; }
+.tabs { background: var(--desk); padding: 4px; border-radius: 8px; justify-self: start; }
+.tabs button { border: 0; background: transparent; }
+.tabs button[aria-pressed="true"] { background: var(--panel); border: 1px solid var(--line); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.row-label { color: var(--muted); font-size: 14px; min-width: 3ch; }
+.hint { margin: 0; color: var(--muted); }
+
+.pad-box { display: grid; gap: 6px; }
+/* The box takes the pointer and refuses every touch gesture (T1); the SVG
+   inside only draws. */
+.pad-surface {
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#pad {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  background: #fbfbf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  pointer-events: none;
+}
+#pad .baseline { stroke: #9aa39c; stroke-width: 3; stroke-dasharray: 6 14; }
+.pad-hint { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }
+
+.preview {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background-color: var(--check-a);
+  background-image:
+    linear-gradient(45deg, var(--check-b) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--check-b) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--check-b) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--check-b) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+.preview canvas { max-width: 100%; max-height: 260px; height: auto; }
+.preview .empty { color: var(--muted); }
+.source { margin: 0; color: var(--muted); font-size: 14px; }
+.saved { width: min(560px, 100%); }
+.saved-detail { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .file strong { max-width: 20ch; }
+  .nav { order: 3; width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}
+
+/* The picture options are switches: say so with a box, not only a border. */
+button[data-action^="picture."][aria-pressed]::before { content: "☐"; margin-right: 8px; font-weight: 400; }
+button[data-action^="picture."][aria-pressed="true"]::before { content: "☑"; }
