@@ -1,16 +1,93 @@
 [
   {
-    "name": "an empty title is refused",
-    "file": "crates/core/src/page.rs",
-    "find": "if strings.title.trim().is_empty() {",
+    "name": "a new signature's bottom edge lands on the tap (PS-2)",
+    "file": "crates/core/src/place.rs",
+    "find": "            y: py - h,",
+    "replace": "            y: py,",
+    "test": "a_tap_puts_the_bottom_edge_on_the_tap"
+  },
+  {
+    "name": "a page turned 90 degrees maps display top to user x (PS-2)",
+    "file": "crates/core/src/place.rs",
+    "find": "90 => (0, sx, -sy, 0, x0 + r.y + r.h, y0 + r.x),",
+    "replace": "90 => (0, sx, -sy, 0, x0 + r.y, y0 + r.x),",
+    "test": "page_turned_90_maps_display_left_to_user_bottom"
+  },
+  {
+    "name": "an offset crop box moves the origin (PS-2)",
+    "file": "crates/core/src/place.rs",
+    "find": "_ => (sx, 0, 0, sy, x0 + r.x, y1 - r.y - r.h),",
+    "replace": "_ => (sx, 0, 0, sy, r.x, y1 - r.y - r.h),",
+    "test": "an_offset_crop_box_shifts_the_origin"
+  },
+  {
+    "name": "an encrypted PDF is refused (PS-5)",
+    "file": "crates/core/src/pdf/doc.rs",
+    "find": "if doc.trailer.get(\"Encrypt\").is_some() {",
     "replace": "if false {",
-    "test": "an_empty_title_is_rejected_by_name"
+    "test": "an_encrypted_file_is_refused"
+  },
+  {
+    "name": "a PDF certified against changes is refused (PS-5)",
+    "file": "crates/core/src/pdf/doc.rs",
+    "find": "            if p == 1 {",
+    "replace": "            if p == 9 {",
+    "test": "a_file_certified_against_changes_is_refused_and_p2_is_not"
+  },
+  {
+    "name": "the update keeps the original's kind of cross-reference",
+    "file": "crates/core/src/pdf/write.rs",
+    "find": "    match doc.xref_kind {",
+    "replace": "    match XrefKind::Table {",
+    "test": "the_update_uses_the_same_kind_of_cross_reference_as_the_original"
+  },
+  {
+    "name": "the old contents are wrapped in q and Q",
+    "file": "crates/core/src/pdf/write.rs",
+    "find": "        let mut contents = vec![Obj::Ref(open, 0)];",
+    "replace": "        let mut contents = vec![];",
+    "test": "the_signed_page_wraps_the_old_contents_and_then_draws"
+  },
+  {
+    "name": "a new resource name never takes one the page uses",
+    "file": "crates/core/src/pdf/write.rs",
+    "find": "    while taken.get(&name).is_some() {",
+    "replace": "    while false {",
+    "test": "indirect_contents_arrays_and_resources_are_followed"
+  },
+  {
+    "name": "once a pen is seen, touches draw nothing",
+    "file": "crates/core/src/ink.rs",
+    "find": "if (self.pen_seen && p.kind == \"touch\") || self.active.is_some() {",
+    "replace": "if self.active.is_some() {",
+    "test": "once_a_pen_is_seen_touches_draw_nothing"
+  },
+  {
+    "name": "light pixels become clear",
+    "file": "crates/core/src/picture.rs",
+    "find": "let keep = if luma >= PAPER {",
+    "replace": "let keep = if luma >= 256 {",
+    "test": "paper_becomes_clear_and_ink_stays"
+  },
+  {
+    "name": "inside the box only the inner half of a corner resizes",
+    "file": "crates/core/src/api.rs",
+    "find": "let reach = if inside { radius / 2 } else { radius };",
+    "replace": "let reach = radius;",
+    "test": "a_small_signature_grabbed_near_its_corner_moves"
   },
   {
     "name": "an unknown action is refused",
     "file": "crates/core/src/api.rs",
     "find": "other => return Err(format!(\"Unknown action \\\"{other}\\\".\")),",
     "replace": "_ => {}",
-    "test": "act_refuses_an_unknown_action"
+    "test": "act_refuses_an_unknown_action_by_name"
+  },
+  {
+    "name": "a strings file missing a key is refused",
+    "file": "crates/core/src/strings.rs",
+    "find": "None => return Err(format!(\"The strings file has no \\\"{key}\\\".\")),",
+    "replace": "None => {}",
+    "test": "a_missing_or_empty_or_unused_key_is_refused_by_name"
   }
 ]

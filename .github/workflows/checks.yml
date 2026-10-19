@@ -1,0 +1,36 @@
+name: checks
+
+# Runs the same command a person runs locally. The logic lives in
+# scripts/check.sh, not here. Nothing in this workflow deploys.
+# CI runs Chromium alone (BUILDER-SPEC D7); all four engines run locally
+# before a push. The design journal is never pushed, so its check reports it
+# missing here and does not fail.
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Rust toolchain (pinned in rust-toolchain.toml)
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal --component clippy,rustfmt --target wasm32-unknown-unknown
+
+      - name: wasm-bindgen CLI (pinned)
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen@0.2.127
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Playwright and browser engines
+        run: PLAYWRIGHT_WITH_DEPS=1 ./scripts/setup.sh
+
+      - name: ./scripts/check.sh
+        run: BUILDER_ENGINES=chromium ./scripts/check.sh

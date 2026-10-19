@@ -2,21 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Reference default. connect-src 'self' keeps fetches on this origin;
-       'wasm-unsafe-eval' lets the page compile its own WebAssembly module;
-       form-action 'none' blocks form posts. A meta policy cannot stop data
-       leaving by navigation, so the browser check still watches requests. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Builder tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- The privacy kit's policy (PS-3): the reference default, plus no fonts,
+       frames, workers or manifest from anywhere. 'wasm-unsafe-eval' lets the
+       page compile its own WebAssembly; img-src allows blob: and data: for
+       pictures made inside the tab. A meta policy cannot stop data leaving by
+       navigation, so the browser check still watches every request. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>PDF Signature Adder</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body data-ready="false">
-  <main>
-    <h1 id="title"></h1>
-    <div id="panels"></div>
-    <p id="message" role="status"></p>
+<body data-ready="false" data-screen="loading">
+  <header id="bar">
+    <div class="bar-file">
+      <div id="file-actions" class="group"></div>
+      <div id="file" class="file" hidden>
+        <strong id="file-name"></strong>
+        <span id="file-detail"></span>
+      </div>
+    </div>
+    <nav id="nav" class="group nav" aria-label="Pages" hidden>
+      <span id="nav-label" class="nav-label" aria-live="polite"></span>
+    </nav>
+    <div id="tools" class="group tools"></div>
+  </header>
+
+  <div id="status-bar" class="status-bar">
+    <p id="status" role="status"></p>
+    <div id="status-actions" class="group"></div>
+  </div>
+  <p id="message" class="message" role="alert"></p>
+  <p id="note" class="note"></p>
+
+  <main id="main">
+    <section id="start" class="start" hidden>
+      <h1 id="title"></h1>
+      <p id="tagline" class="tagline"></p>
+      <h2 id="start-heading"></h2>
+      <p id="start-text"></p>
+      <div id="start-actions" class="group"></div>
+      <p id="privacy" class="privacy"></p>
+      <p id="drop-hint" class="drop-hint"></p>
+    </section>
+    <div id="pages" class="pages"></div>
   </main>
+
+  <div id="sheet-backdrop" class="backdrop" hidden>
+    <section id="sheet" class="dialog sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></section>
+  </div>
+  <div id="saved-backdrop" class="backdrop" hidden>
+    <section id="saved" class="dialog saved" role="dialog" aria-modal="true" aria-labelledby="saved-title"></section>
+  </div>
+
+  <input id="pdf-input" type="file" accept="application/pdf,.pdf" hidden>
+  <input id="image-input" type="file" accept="image/*,.svg" hidden>
   <noscript><p>This page needs JavaScript and WebAssembly.</p></noscript>
   <script type="module" src="app.js"></script>
 </body>

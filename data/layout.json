@@ -1,0 +1,7 @@
+{
+  "_note": "Presentation values the page needs and may not write in its own code (BUILDER-SPEC D3).",
+  "paintMargin": "1600px 0px",
+  "pdfType": "application/pdf",
+  "pngType": "image/png",
+  "svgType": "image/svg+xml"
+}
