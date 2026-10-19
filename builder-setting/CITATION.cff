@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use Builder, please cite the version you used."
+type: software
+title: "Builder: a reusable technical setting for small browser tools built with coding agents"
+abstract: >-
+  Builder keeps a browser tool's application rules in a fast-tested Rust core
+  with no input or output, connects that core to a static page through a thin
+  wasm-bindgen shim that decides nothing, and adds repository instructions, a
+  nine-stage build procedure, and one check command covering the core, the
+  WebAssembly import boundary and the page in three browser engines.
+authors:
+  - family-names: Gilson
+    given-names: Sam
+    orcid: "https://orcid.org/0009-0002-2394-8649"
+    affiliation: "North Carolina State University"
+version: 0.1.0
+date-released: "2026-10-07"
+license: MIT
+repository-code: "https://github.com/sgilson7/builder-setting"
+keywords:
+  - coding agents
+  - WebAssembly
+  - Rust
+  - computing education
+  - static sites
+  - mutation testing

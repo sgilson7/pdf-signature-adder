@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" width="760" height="250" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <title id="t">Builder: core, shim, page</title>
+  <desc id="d">Three boxes left to right. The core holds every rule and is tested by cargo test without a browser. The shim moves values across the WebAssembly boundary and is audited by its imports. The page draws what the core returns and is checked in three browser engines.</desc>
+  <style>
+    .box { fill: #ffffff; stroke: #1d232a; stroke-width: 2; }
+    .core { fill: #f7e9e9; }
+    .h { font-size: 20px; font-weight: 700; fill: #1d232a; }
+    .s { font-size: 14px; fill: #1d232a; }
+    .c { font-size: 13px; fill: #5a646e; }
+    .arrow { stroke: #1d232a; stroke-width: 2; fill: none; marker-end: url(#m); marker-start: url(#m); }
+    .check { stroke: #9b1c1c; stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+  </style>
+  <defs>
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d232a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="250" fill="#ffffff"/>
+  <rect class="box core" x="20" y="30" width="210" height="120" rx="8"/>
+  <text class="h" x="125" y="62" text-anchor="middle">core</text>
+  <text class="s" x="125" y="88" text-anchor="middle">every application rule</text>
+  <text class="s" x="125" y="108" text-anchor="middle">no input or output</text>
+  <text class="s" x="125" y="128" text-anchor="middle">Rust crate</text>
+
+  <rect class="box" x="275" y="30" width="210" height="120" rx="8"/>
+  <text class="h" x="380" y="62" text-anchor="middle">shim</text>
+  <text class="s" x="380" y="88" text-anchor="middle">moves values across</text>
+  <text class="s" x="380" y="108" text-anchor="middle">decides nothing</text>
+  <text class="s" x="380" y="128" text-anchor="middle">wasm-bindgen</text>
+
+  <rect class="box" x="530" y="30" width="210" height="120" rx="8"/>
+  <text class="h" x="635" y="62" text-anchor="middle">page</text>
+  <text class="s" x="635" y="88" text-anchor="middle">draws what core returns</text>
+  <text class="s" x="635" y="108" text-anchor="middle">static HTML, CSS, JS</text>
+  <text class="s" x="635" y="128" text-anchor="middle">any static host</text>
+
+  <path class="arrow" d="M232,90 L273,90"/>
+  <path class="arrow" d="M487,90 L528,90"/>
+
+  <path class="check" d="M125,150 L125,185"/>
+  <path class="check" d="M380,150 L380,185"/>
+  <path class="check" d="M635,150 L635,185"/>
+  <text class="c" x="125" y="205" text-anchor="middle">cargo test + boundary tests</text>
+  <text class="c" x="125" y="223" text-anchor="middle">seconds, no browser</text>
+  <text class="c" x="380" y="205" text-anchor="middle">import audit</text>
+  <text class="c" x="380" y="223" text-anchor="middle">imports followed into glue</text>
+  <text class="c" x="635" y="205" text-anchor="middle">browser check</text>
+  <text class="c" x="635" y="223" text-anchor="middle">Chromium, Firefox, WebKit</text>
+</svg>

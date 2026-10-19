@@ -1,0 +1,9 @@
+{
+  "title": "Bounded counter",
+  "intro": "The minimal Builder example. The rule that keeps the count between zero and the maximum is in crates/core/src/counter.rs; this page only draws what that rule returns.",
+  "max": 10,
+  "step": 3,
+  "add_label": "Add",
+  "remove_label": "Remove",
+  "reset_label": "Reset"
+}

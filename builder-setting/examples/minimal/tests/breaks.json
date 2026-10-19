@@ -1,0 +1,9 @@
+[
+  {
+    "name": "the count stops at the maximum",
+    "file": "crates/core/src/counter.rs",
+    "find": "(state.count + s.step).min(s.max)",
+    "replace": "state.count + s.step",
+    "test": "adding_stops_at_the_maximum"
+  }
+]
