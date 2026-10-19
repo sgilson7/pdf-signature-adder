@@ -53,7 +53,7 @@ A static page that signs a PDF the reader already has: open it, draw a signature
 
 ## Open for the person
 
-No `SECOND-ORDER.md` row has status *person*. What only the person can check (stage 7): open a real form on the iPad, sign it with the Pencil, save it, and open the copy in Files, Preview and Acrobat; paste a signature from Photos; read the strings in `data/strings.json`.
+No `SECOND-ORDER.md` row has status *person*. R2.1 (open): retry signing with the Pencil on the iPad, to confirm T1. What only the person can check (stage 7): open a real form on the iPad, sign it with the Pencil, save it, and open the copy in Files, Preview and Acrobat; paste a signature from Photos; read the strings in `data/strings.json`.
 
 ## Mistakes so far
 

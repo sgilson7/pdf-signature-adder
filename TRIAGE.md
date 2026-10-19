@@ -6,4 +6,4 @@ Compare at least one result with a case worked out by hand. **Severity** is *blo
 
 | # | Request, in the person's words | Expected | What happened | Severity | Cost | Disposition |
 | --- | --- | --- | --- | --- | --- | --- |
-| T1 | | | | | | |
+| T1 | "works on laptop, failed on ipad with apple pencil. when i tried to sign, it would scroll the view in the background and would only get a single splotch of ink before it would scroll the background view" | A Pencil stroke on the pad draws a whole line and nothing behind the sheet moves. | On a real iPad, Safari began scrolling on the Pencil's first move, cancelled the pointer, and the stroke ended after one dot. The pad relied on `touch-action: none` on its SVG, which WebKit does not reliably honour, and the page behind the sheet was free to scroll. | blocks use | small | done: the pad's input moved to an HTML box with `touch-action: none`, touch events on it are cancelled, a placed signature holds a touch while bare page still scrolls, and an open dialog locks the page. Five browser checks added (R2.1). Awaiting the person's retry on the iPad. |

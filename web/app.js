@@ -68,6 +68,9 @@ function render() {
   document.title = ui.title;
   document.body.dataset.screen = ui.screen;
   document.body.dataset.placing = String(ui.placing);
+  // While a dialog is open the page behind it is locked, so a stroke on the
+  // pad can never scroll it (T1).
+  document.body.dataset.dialog = String(Boolean(ui.sheet || ui.saved));
   region("bar", [ui.file, ui.toolbar, ui.zoom, ui.nav], drawBar);
   region("status", [ui.status, ui.status_actions, ui.message, ui.note], drawStatus);
   region("start", [ui.screen, ui.title, ui.tagline, ui.start, ui.drop_hint, ui.toolbar], drawStart);
@@ -269,6 +272,17 @@ function pointerText(e, node) {
   return [e.pointerId, e.pointerType, e.clientX, e.clientY, r.left, r.top, r.width, r.height].join("|");
 }
 
+// iPad Safari starts a scroll from touch events (the Pencil's included) unless
+// they are cancelled, and a scroll cancels the pointer: one dot of ink, then
+// the page moves (T1). touch-action alone was not enough on the SVG pad.
+function holdStill(node, only) {
+  const stop = (e) => {
+    if (!only || e.target.closest(only)) e.preventDefault();
+  };
+  node.addEventListener("touchstart", stop, { passive: false });
+  node.addEventListener("touchmove", stop, { passive: false });
+}
+
 function capture(node, e) {
   try {
     node.setPointerCapture(e.pointerId);
@@ -279,6 +293,8 @@ function capture(node, e) {
 
 function watchPointer(paper, k) {
   let pressed = null;
+  // A finger on a placed signature drags it; elsewhere it scrolls the page.
+  holdStill(paper, ".overlay");
   paper.addEventListener("pointerdown", (e) => {
     if (e.button > 0 || e.target.closest(".selection-actions")) return;
     pressed = e.pointerId;
@@ -376,14 +392,19 @@ function drawSheet(sheet) {
   const body = make("div", "sheet-body");
   if (sheet.pad) {
     const box = make("div", "pad-box");
+    // The pointer events land on a plain box around the drawing, where
+    // WebKit honours touch-action; on the SVG itself it may not (T1).
+    const surface = make("div", "pad-surface");
+    surface.id = "pad-surface";
     const pad = svg("svg", { id: "pad", viewBox: sheet.pad.view_box, role: "img", "aria-label": sheet.pad.label });
     pad.append(
       svg("line", { x1: "0", y1: sheet.pad.baseline, x2: "100%", y2: sheet.pad.baseline, class: "baseline" }),
       svg("g", { id: "pad-ink", fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }),
     );
-    box.append(pad, make("p", "pad-hint", sheet.pad.hint));
+    surface.append(pad);
+    box.append(surface, make("p", "pad-hint", sheet.pad.hint));
     body.append(box);
-    watchPad(pad);
+    watchPad(surface);
   } else {
     if (sheet.hint) body.append(make("p", "hint", sheet.hint));
     const preview = make("div", "preview");
@@ -416,6 +437,7 @@ function drawPadPaths(value) {
 
 function watchPad(pad) {
   let pressed = null;
+  holdStill(pad);
   pad.addEventListener("pointerdown", (e) => {
     if (e.button > 0) return;
     pressed = e.pointerId;

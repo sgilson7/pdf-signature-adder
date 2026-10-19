@@ -156,7 +156,10 @@ body[data-placing="true"] .paper { cursor: crosshair; outline: 2px dashed var(--
   place-items: center;
   padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
+/* An open dialog locks the page behind it (T1). */
+body[data-dialog="true"] { overflow: hidden; }
 .dialog {
   width: min(900px, 100%);
   background: var(--panel);
@@ -178,17 +181,24 @@ body[data-placing="true"] .paper { cursor: crosshair; outline: 2px dashed var(--
 .hint { margin: 0; color: var(--muted); }
 
 .pad-box { display: grid; gap: 6px; }
-#pad {
-  width: 100%;
-  aspect-ratio: 3 / 1;
-  background: #fbfbf8;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+/* The box takes the pointer and refuses every touch gesture (T1); the SVG
+   inside only draws. */
+.pad-surface {
   touch-action: none;
   cursor: crosshair;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#pad {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  background: #fbfbf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  pointer-events: none;
 }
 #pad .baseline { stroke: #9aa39c; stroke-width: 3; stroke-dasharray: 6 14; }
 .pad-hint { margin: 0; text-align: center; color: var(--muted); font-size: 14px; }

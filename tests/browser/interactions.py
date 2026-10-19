@@ -43,6 +43,26 @@ def tap(page, selector, fx, fy, touch):
         target.click(position=at)
 
 
+TOUCH_PREVENTED = """(selector) => {
+    const e = new Event('touchmove', { cancelable: true, bubbles: true });
+    document.querySelector(selector).dispatchEvent(e);
+    return e.defaultPrevented;
+}"""
+
+PEN_STROKE = """() => {
+    // A Pencil stroke as Safari reports it: pointerType "pen", many moves.
+    const s = document.getElementById('pad-surface');
+    const r = s.getBoundingClientRect();
+    const at = (k) => ({ pointerId: 7, pointerType: 'pen', bubbles: true, cancelable: true,
+        clientX: r.left + r.width * (0.2 + 0.06 * k), clientY: r.top + r.height * (0.5 + (k % 2 ? 0.1 : -0.1)) });
+    s.dispatchEvent(new PointerEvent('pointerdown', at(0)));
+    for (let k = 1; k <= 8; k++) s.dispatchEvent(new PointerEvent('pointermove', at(k)));
+    s.dispatchEvent(new PointerEvent('pointerup', at(8)));
+    const paths = [...document.querySelectorAll('#pad-ink path')];
+    return paths.map((p) => p.getAttribute('d'));
+}"""
+
+
 def run(page, check, engine):
     touch = engine.endswith("ipad") or engine.endswith("iphone")
     check(page.inner_text("#title") == STRINGS["title"], "the title from data/strings.json is drawn")
@@ -79,6 +99,17 @@ def run(page, check, engine):
         page.mouse.move(pad["x"] + pad["width"] * (0.1 + 0.1 * k), pad["y"] + pad["height"] * (0.6 - 0.04 * (k % 2)))
     page.mouse.up()
     check(page.locator("#pad-ink path").count() == 1, "one stroke drawn on the signature pad")
+
+    # T1: on an iPad the Pencil scrolled the page after one dot. Emulation
+    # cannot scroll the way Safari does, so these check the guards themselves.
+    touch_action = page.evaluate("() => getComputedStyle(document.getElementById('pad-surface')).touchAction")
+    check(touch_action == "none", f"the pad's box refuses touch gestures (touch-action {touch_action}) (T1)")
+    check(page.evaluate(TOUCH_PREVENTED, "#pad-surface"), "a touch moving on the pad is cancelled, so it cannot scroll (T1)")
+    locked = page.evaluate("() => getComputedStyle(document.body).overflow")
+    check(locked == "hidden", f"the page behind the open sheet is locked (overflow {locked}) (T1)")
+    page.click("button[data-action='pad.clear']")
+    paths = page.evaluate(PEN_STROKE)
+    check(len(paths) == 1 and paths[0].count("C") >= 6, f"a Pencil stroke of nine samples is one curve of eight segments {paths} (T1)")
     page.click("button[data-action='signature.use']")
     page.wait_for_selector("body[data-placing='true']")
     check(page.inner_text("#status") == STRINGS["status_placing"], "the status line says where to tap")
@@ -95,6 +126,10 @@ def run(page, check, engine):
     check(abs(centre - TAP_X) < 0.004, f"the signature is centred on the tap ({centre:.4f} vs {TAP_X:.4f})")
     check(abs(width_in - 2.5) < 0.02, f"the signature starts 2.5 inches wide ({width_in:.3f})")
     check(page.inner_text('[data-page="0"] .page-label') == "Page 1 · signed", "page 1 says it is signed, in words")
+    check(page.evaluate(TOUCH_PREVENTED, '[data-page="0"] .overlay'), "a touch dragging a placed signature cannot scroll (T1)")
+    check(not page.evaluate(TOUCH_PREVENTED, '[data-page="0"] canvas'), "a touch on bare page still scrolls it (T1)")
+    unlocked = page.evaluate("() => getComputedStyle(document.body).overflow")
+    check(unlocked != "hidden", f"with no dialog open the page scrolls (overflow {unlocked})")
 
     # Arrow keys nudge it: Shift+Left moves it 10 points.
     page.keyboard.press("Shift+ArrowLeft")
